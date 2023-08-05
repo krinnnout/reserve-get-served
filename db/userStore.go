@@ -1,21 +1,40 @@
 package db
 
 import (
+	"context"
 	"github.com/krinnnout/reserve-get-served/types"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const UserCollection = "users"
+
 type UserStore interface {
-	GetUserById(string) (*types.User, error)
+	GetUserById(context.Context, string) (*types.User, error)
 }
 
 type MongoUserStore struct {
-	UserStore
 	client *mongo.Client
+	coll   *mongo.Collection
 }
 
 func NewMongoUserStore(client *mongo.Client) *MongoUserStore {
 	return &MongoUserStore{
 		client: client,
+		coll:   client.Database(DBNAME).Collection(UserCollection),
 	}
+}
+
+func (store *MongoUserStore) GetUserById(ctx context.Context, id string) (*types.User, error) {
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	var user types.User
+	if err := store.coll.FindOne(ctx, bson.M{"_id": objId}).Decode(&user); err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

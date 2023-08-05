@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"github.com/gofiber/fiber/v2"
 	"github.com/krinnnout/reserve-get-served/db"
 	"github.com/krinnnout/reserve-get-served/types"
@@ -19,7 +20,8 @@ func NewUserHandler(userStore db.UserStore) *UserHandler {
 
 func (userHandler *UserHandler) HandleGetUser(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
-	user, err := userHandler.userStore.GetUserById(id)
+	c := context.Background()
+	user, err := userHandler.userStore.GetUserById(c, id)
 	if err != nil {
 		log.Fatal(err)
 	}
