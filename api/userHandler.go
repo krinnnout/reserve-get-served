@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/krinnnout/reserve-get-served/db"
+	"github.com/krinnnout/reserve-get-served/types"
 	"log"
 )
 
@@ -33,6 +34,21 @@ func (userHandler *UserHandler) HandleGetUsers(ctx *fiber.Ctx) error {
 	return ctx.JSON(users)
 }
 
-func (UserHandler *UserHandler) HandlePostUser(ctx *fiber.Ctx) error {
-	return nil
+func (userHandler *UserHandler) HandlePostUser(ctx *fiber.Ctx) error {
+	var params types.UserParams
+	if err := ctx.BodyParser(&params); err != nil {
+		return err
+	}
+	if errors := params.Validate(); len(errors) > 0 {
+		return ctx.JSON(errors)
+	}
+	user, err := types.NewUserFromParams(params)
+	if err != nil {
+		return err
+	}
+	insertedUser, err := userHandler.userStore.InsertUser(ctx.Context(), user)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(insertedUser)
 }
