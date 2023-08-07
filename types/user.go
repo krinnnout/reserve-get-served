@@ -2,9 +2,17 @@ package types
 
 import (
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
+)
+
+const (
+	bcryptCost      = 12
+	minFirstNameLen = 2
+	minLastNameLen  = 2
+	minPassLen      = 7
 )
 
 type User struct {
@@ -15,18 +23,27 @@ type User struct {
 	EncryptedPassword string             `bson:"encrypted_password" json:"-"`
 }
 
-const (
-	bcryptCost      = 12
-	minFirstNameLen = 2
-	minLastNameLen  = 2
-	minPassLen      = 7
-)
-
 type UserParams struct {
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
+}
+
+type ModifiableUserParams struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+}
+
+func (p ModifiableUserParams) ToBSON() bson.M {
+	m := bson.M{}
+	if len(p.FirstName) > 0 {
+		m["firstName"] = p.FirstName
+	}
+	if len(p.LastName) > 0 {
+		m["lastName"] = p.LastName
+	}
+	return m
 }
 
 func (params UserParams) Validate() map[string]string {

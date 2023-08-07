@@ -5,6 +5,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/krinnnout/reserve-get-served/db"
 	"github.com/krinnnout/reserve-get-served/types"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 )
@@ -24,7 +26,7 @@ func (handler *UserHandler) HandleGetUser(ctx *fiber.Ctx) error {
 	user, err := handler.userStore.GetUserById(ctx.Context(), id)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return ctx.JSON(map[string]string{"msg": "user not found"})
+			return ctx.JSON(map[string]string{"error": "user not found"})
 		}
 		log.Fatal(err)
 	}
@@ -44,8 +46,8 @@ func (handler *UserHandler) HandlePostUser(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(&params); err != nil {
 		return err
 	}
-	if errors := params.Validate(); len(errors) > 0 {
-		return ctx.JSON(errors)
+	if errs := params.Validate(); len(errs) > 0 {
+		return ctx.JSON(errs)
 	}
 	user, err := types.NewUserFromParams(params)
 	if err != nil {
@@ -67,5 +69,20 @@ func (handler *UserHandler) HandlerDeleteUser(ctx *fiber.Ctx) error {
 }
 
 func (handler *UserHandler) HandlerPutUser(ctx *fiber.Ctx) error {
-	return nil
+	var (
+		values types.ModifiableUserParams
+		id     = ctx.Params("id")
+	)
+	if err := ctx.BodyParser(&values); err != nil {
+		return err
+	}
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	filter := bson.M{"_id": oid}
+	if err := handler.userStore.UpdateUser(ctx.Context(), filter, values); err != nil {
+		return err
+	}
+	return ctx.JSON(map[string]string{"updated document": id})
 }
