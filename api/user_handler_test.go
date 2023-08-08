@@ -14,23 +14,18 @@ import (
 	"testing"
 )
 
-const (
-	testdbUri  = "mongodb://localhost:27017"
-	testdbName = "reserve-get-served-test"
-)
-
 type testdb struct {
 	db.UserStore
 }
 
 func setup(t *testing.T) *testdb {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(testdbUri))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	return &testdb{
-		UserStore: db.NewMongoUserStore(client, testdbName),
+		UserStore: db.NewMongoUserStore(client, db.TestDBNAME),
 	}
 }
 

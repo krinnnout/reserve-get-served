@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/krinnnout/reserve-get-served/api"
 	"github.com/krinnnout/reserve-get-served/db"
@@ -14,8 +13,6 @@ import (
 )
 
 const (
-	dbUri          = "mongodb://localhost:27017"
-	dbName         = "reserve-get-served"
 	userCollection = "users"
 )
 
@@ -29,13 +26,12 @@ func main() {
 	listenAddress := flag.String("Listen Address", ":5000", "The listen address for the api")
 	flag.Parse()
 
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(dbUri))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(client)
 	//Handlers initialization
-	userHandler := api.NewUserHandler(db.NewMongoUserStore(client, dbName))
+	userHandler := api.NewUserHandler(db.NewMongoUserStore(client, db.DBNAME))
 
 	app := fiber.New(config)
 	apiv1 := app.Group("/api/v1")
