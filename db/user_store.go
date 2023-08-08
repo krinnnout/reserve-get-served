@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"github.com/krinnnout/reserve-get-served/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -10,7 +11,12 @@ import (
 
 const UserCollection = "users"
 
+type Dropper interface {
+	Drop(context.Context) error
+}
+
 type UserStore interface {
+	Dropper
 	GetUserById(context.Context, string) (*types.User, error)
 	GetUsers(context.Context) ([]*types.User, error)
 	InsertUser(context.Context, *types.User) (*types.User, error)
@@ -23,10 +29,10 @@ type MongoUserStore struct {
 	coll   *mongo.Collection
 }
 
-func NewMongoUserStore(client *mongo.Client) *MongoUserStore {
+func NewMongoUserStore(client *mongo.Client, dbname string) *MongoUserStore {
 	return &MongoUserStore{
 		client: client,
-		coll:   client.Database(DBNAME).Collection(UserCollection),
+		coll:   client.Database(dbname).Collection(UserCollection),
 	}
 }
 
@@ -85,4 +91,9 @@ func (store *MongoUserStore) UpdateUser(ctx context.Context, filter bson.M, valu
 	}
 	return nil
 
+}
+
+func (store *MongoUserStore) Drop(ctx context.Context) error {
+	fmt.Println("---dropping user collection")
+	return store.coll.Drop(ctx)
 }
