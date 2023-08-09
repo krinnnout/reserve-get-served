@@ -12,10 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const (
-	userCollection = "users"
-)
-
 var config = fiber.Config{
 	ErrorHandler: func(ctx *fiber.Ctx, err error) error {
 		return ctx.JSON(map[string]string{"error": err.Error()})
@@ -31,16 +27,23 @@ func main() {
 		log.Fatal(err)
 	}
 	//Handlers initialization
-	userHandler := api.NewUserHandler(db.NewMongoUserStore(client, db.DBNAME))
+	var (
+		userHandler  = api.NewUserHandler(db.NewMongoUserStore(client, db.DBNAME))
+		hotelStore   = db.NewMongoHotelStore(client)
+		hotelHandler = api.NewHotelHandler(db.NewMongoRoomStore(client, hotelStore), hotelStore)
+		app          = fiber.New(config)
+		apiv1        = app.Group("/api/v1")
+	)
 
-	app := fiber.New(config)
-	apiv1 := app.Group("/api/v1")
-
+	//user handlers
 	apiv1.Get("/users", userHandler.HandleGetUsers)
 	apiv1.Get("/users/:id", userHandler.HandleGetUser)
 	apiv1.Post("/users", userHandler.HandlePostUser)
 	apiv1.Delete("/users/:id", userHandler.HandlerDeleteUser)
 	apiv1.Put("/users/:id", userHandler.HandlerPutUser)
+
+	//hotel handlers
+	apiv1.Get("/hotels", hotelHandler.HandleGetHotels)
 
 	if err = app.Listen(*listenAddress); err != nil {
 		log.Fatal(err)
