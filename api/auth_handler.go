@@ -8,6 +8,7 @@ import (
 	"github.com/krinnnout/reserve-get-served/db"
 	"github.com/krinnnout/reserve-get-served/types"
 	"go.mongodb.org/mongo-driver/mongo"
+	"net/http"
 	"os"
 	"time"
 )
@@ -32,6 +33,18 @@ type AuthResponse struct {
 	Token string      `json:"token"`
 }
 
+type GenericResponse struct {
+	Type string `json:"type"`
+	Msg  string `json:"msg"`
+}
+
+func invalidCredentials(c *fiber.Ctx) error {
+	return c.Status(http.StatusBadRequest).JSON(GenericResponse{
+		Type: "error",
+		Msg:  "invalid credentials",
+	})
+}
+
 func (handler *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 	var params AuthParams
 	if err := c.BodyParser(&params); err != nil {
@@ -41,7 +54,7 @@ func (handler *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 	user, err := handler.userStore.GetUserByEmail(c.Context(), params.Email)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return fmt.Errorf("invalid credentials")
+			return invalidCredentials(c)
 		}
 		return err
 	}
