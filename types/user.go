@@ -68,6 +68,11 @@ func isEmailValid(e string) bool {
 	return regexp.MustCompile(`[a-z0-9]+@[a-z]+\.[a-z]{2,3}`).MatchString(e)
 }
 
+func IsPasswordValid(encpw, pw string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(encpw), []byte(pw)) == nil
+
+}
+
 func NewUserFromParams(params UserParams) (*User, error) {
 	encrPsw, err := bcrypt.GenerateFromPassword([]byte(params.Password), bcryptCost)
 	if err != nil {
