@@ -3,12 +3,11 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/krinnnout/reserve-get-served/api"
+	"github.com/krinnnout/reserve-get-served/api/middleware"
 	"github.com/krinnnout/reserve-get-served/db"
-	"github.com/krinnnout/reserve-get-served/middleware"
-
-	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -40,8 +39,9 @@ func main() {
 		hotelHandler = api.NewHotelHandler(store)
 		userHandler  = api.NewUserHandler(userStore)
 		authHandler  = api.NewAuthHandler(userStore)
+		roomHandler  = api.NewRoomHandler(store)
 		app          = fiber.New(config)
-		apiv1        = app.Group("/api/v1", middleware.JWTAuthentication)
+		apiv1        = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
 		auth         = app.Group("/api")
 	)
 
@@ -59,6 +59,7 @@ func main() {
 	apiv1.Get("/hotels", hotelHandler.HandleGetHotels)
 	apiv1.Get("/hotels/:id/rooms", hotelHandler.HandleGetRooms)
 	apiv1.Get("/hotels/:id", hotelHandler.HandleGetHotel)
+	apiv1.Post("/rooms/:id/book", roomHandler.HandleBookRoom)
 
 	if err = app.Listen(*listenAddress); err != nil {
 		log.Fatal(err)
