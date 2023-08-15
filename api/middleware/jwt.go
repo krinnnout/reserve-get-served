@@ -26,7 +26,7 @@ func JWTAuthentication(userStore db.UserStore) fiber.Handler {
 		if time.Now().Unix() > expires {
 			return fmt.Errorf("session ended")
 		}
-		userId := claims["id"].(string)
+		userId := claims["userId"].(string)
 		user, err := userStore.GetUserById(c.Context(), userId)
 		if err != nil {
 			return fmt.Errorf("unauthorized")
