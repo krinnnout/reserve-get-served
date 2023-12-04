@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/krinnnout/reserve-get-served/db"
-	"github.com/krinnnout/reserve-get-served/types"
+	"github.com/krinnnout/reserve-get-served/models"
 	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
 	"os"
@@ -29,8 +29,8 @@ type AuthParams struct {
 }
 
 type AuthResponse struct {
-	User  *types.User `json:"user"`
-	Token string      `json:"token"`
+	User  *models.User `json:"user"`
+	Token string       `json:"token"`
 }
 
 type GenericResponse struct {
@@ -58,7 +58,7 @@ func (handler *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 		}
 		return err
 	}
-	if !types.IsPasswordValid(user.EncryptedPassword, params.Password) {
+	if !models.IsPasswordValid(user.EncryptedPassword, params.Password) {
 		return fmt.Errorf("invalid credentials")
 	}
 	fmt.Println(user)
@@ -69,7 +69,7 @@ func (handler *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 	return c.JSON(authResponse)
 }
 
-func createTokenFromUser(user *types.User) string {
+func createTokenFromUser(user *models.User) string {
 	now := time.Now()
 	expires := now.Add(time.Hour * 4).Unix()
 	claims := jwt.MapClaims{

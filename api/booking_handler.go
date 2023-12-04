@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/krinnnout/reserve-get-served/db"
-	"github.com/krinnnout/reserve-get-served/types"
+	"github.com/krinnnout/reserve-get-served/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
 )
@@ -33,7 +33,7 @@ func (handler *BookingHandler) HandleGetBooking(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	user, ok := c.Context().UserValue("user").(*types.User)
+	user, ok := c.Context().UserValue("user").(*models.User)
 	if !ok {
 		return fmt.Errorf("user not found")
 	}

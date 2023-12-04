@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/krinnnout/reserve-get-served/db"
-	"github.com/krinnnout/reserve-get-served/types"
+	"github.com/krinnnout/reserve-get-served/models"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"net/http/httptest"
@@ -41,7 +41,7 @@ func TestPostUser(t *testing.T) {
 	app := fiber.New()
 	userHandler := NewUserHandler(tdb.UserStore)
 	app.Post("/", userHandler.HandlePostUser)
-	params := types.UserParams{
+	params := models.UserParams{
 		FirstName: "testfname",
 		LastName:  "testlname",
 		Email:     "test@test.com",
@@ -52,7 +52,7 @@ func TestPostUser(t *testing.T) {
 	req.Header.Add("Content-Type", "application/json")
 	resp, _ := app.Test(req)
 	fmt.Println(resp)
-	var user types.User
+	var user models.User
 	if len(user.Id) == 0 {
 		t.Errorf("expected a user id to be set")
 	}

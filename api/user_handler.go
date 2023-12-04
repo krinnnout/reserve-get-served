@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/krinnnout/reserve-get-served/db"
-	"github.com/krinnnout/reserve-get-served/types"
+	"github.com/krinnnout/reserve-get-served/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -42,14 +42,14 @@ func (handler *UserHandler) HandleGetUsers(ctx *fiber.Ctx) error {
 }
 
 func (handler *UserHandler) HandlePostUser(ctx *fiber.Ctx) error {
-	var params types.UserParams
+	var params models.UserParams
 	if err := ctx.BodyParser(&params); err != nil {
 		return err
 	}
 	if errs := params.Validate(); len(errs) > 0 {
 		return ctx.JSON(errs)
 	}
-	user, err := types.NewUserFromParams(params)
+	user, err := models.NewUserFromParams(params)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (handler *UserHandler) HandlerDeleteUser(ctx *fiber.Ctx) error {
 
 func (handler *UserHandler) HandlerPutUser(ctx *fiber.Ctx) error {
 	var (
-		values types.ModifiableUserParams
+		values models.ModifiableUserParams
 		id     = ctx.Params("id")
 	)
 	if err := ctx.BodyParser(&values); err != nil {

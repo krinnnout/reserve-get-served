@@ -6,16 +6,16 @@ import (
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/krinnnout/reserve-get-served/db"
-	"github.com/krinnnout/reserve-get-served/types"
+	"github.com/krinnnout/reserve-get-served/models"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
 )
 
-func InsertTestUser(t *testing.T, userStore db.UserStore) *types.User {
+func InsertTestUser(t *testing.T, userStore db.UserStore) *models.User {
 	c := context.Background()
-	user, err := types.NewUserFromParams(types.UserParams{FirstName: "James", LastName: "Bebra", Email: "james@foo.com", Password: "supersecuredpassword"})
+	user, err := models.NewUserFromParams(models.UserParams{FirstName: "James", LastName: "Bebra", Email: "james@foo.com", Password: "supersecuredpassword"})
 	if err != nil {
 		t.Fatal(err)
 	}
