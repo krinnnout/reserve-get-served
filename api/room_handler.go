@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/krinnnout/reserve-get-served/db"
-	"github.com/krinnnout/reserve-get-served/models"
+	"github.com/krinnnout/reserve-get-served/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
@@ -35,13 +35,13 @@ func (handler *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	user, ok := c.Context().Value("user").(*models.User)
+	user, ok := c.Context().Value("user").(*types.User)
 	if !ok {
 		return c.Status(http.StatusInternalServerError).JSON(GenericResponse{Type: "error", Msg: "internal server error"})
 
 	}
 
-	booking := models.Booking{
+	booking := types.Booking{
 		UserId:      user.Id,
 		RoomId:      roomId,
 		FromDate:    params.FromDate,

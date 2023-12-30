@@ -2,15 +2,15 @@ package db
 
 import (
 	"context"
-	"github.com/krinnnout/reserve-get-served/models"
+	"github.com/krinnnout/reserve-get-served/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type RoomStore interface {
-	InsertRoom(ctx context.Context, hotel *models.Room) (*models.Room, error)
-	GetRooms(ctx context.Context, filter bson.M) ([]*models.Room, error)
+	InsertRoom(ctx context.Context, hotel *types.Room) (*types.Room, error)
+	GetRooms(ctx context.Context, filter bson.M) ([]*types.Room, error)
 }
 
 type MongoRoomStore struct {
@@ -28,7 +28,7 @@ func NewMongoRoomStore(client *mongo.Client, hotelStore HotelStore) *MongoRoomSt
 	}
 }
 
-func (store *MongoRoomStore) InsertRoom(ctx context.Context, room *models.Room) (*models.Room, error) {
+func (store *MongoRoomStore) InsertRoom(ctx context.Context, room *types.Room) (*types.Room, error) {
 	resp, err := store.coll.InsertOne(ctx, room)
 	if err != nil {
 		return nil, err
@@ -44,12 +44,12 @@ func (store *MongoRoomStore) InsertRoom(ctx context.Context, room *models.Room) 
 	return room, nil
 }
 
-func (store *MongoRoomStore) GetRooms(ctx context.Context, filter bson.M) ([]*models.Room, error) {
+func (store *MongoRoomStore) GetRooms(ctx context.Context, filter bson.M) ([]*types.Room, error) {
 	resp, err := store.coll.Find(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
-	var rooms []*models.Room
+	var rooms []*types.Room
 	if err = resp.All(ctx, &rooms); err != nil {
 		return nil, err
 	}

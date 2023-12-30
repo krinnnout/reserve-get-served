@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/krinnnout/reserve-get-served/db"
-	"github.com/krinnnout/reserve-get-served/models"
+	"github.com/krinnnout/reserve-get-served/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -19,13 +19,13 @@ var (
 )
 
 func seedHotel(name, location string, rating int) {
-	hotel := models.Hotel{
+	hotel := types.Hotel{
 		Name:     name,
 		Location: location,
 		Rooms:    []primitive.ObjectID{},
 		Rating:   rating,
 	}
-	rooms := []models.Room{
+	rooms := []types.Room{
 		{
 			Size:  "small",
 			Price: 99.9,
@@ -55,7 +55,7 @@ func seedHotel(name, location string, rating int) {
 }
 
 func seedUser(fname, lname, password, email string, isAdmin bool) {
-	user, err := models.NewUserFromParams(models.UserParams{FirstName: fname, LastName: lname, Email: email, Password: password})
+	user, err := types.NewUserFromParams(types.UserParams{FirstName: fname, LastName: lname, Email: email, Password: password})
 	if err != nil {
 		log.Fatal(err)
 	}
