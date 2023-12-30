@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	api "github.com/krinnnout/reserve-get-served/api/handlers"
 	"github.com/krinnnout/reserve-get-served/db"
 	"github.com/krinnnout/reserve-get-served/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -65,7 +66,7 @@ func seedUser(fname, lname, password, email string, isAdmin bool) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%s -> %s\n", user.Email)
+	fmt.Printf("%s -> %s\n", user.Email, api.CreateTokenFromUser(user))
 }
 
 func main() {
