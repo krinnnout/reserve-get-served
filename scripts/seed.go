@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/krinnnout/reserve-get-served/db"
 	"github.com/krinnnout/reserve-get-served/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -64,7 +65,7 @@ func seedUser(fname, lname, password, email string, isAdmin bool) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	fmt.Printf("%s -> %s\n", user.Email)
 }
 
 func main() {

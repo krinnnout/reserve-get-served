@@ -5,7 +5,7 @@ import (
 	"flag"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
-	"github.com/krinnnout/reserve-get-served/api"
+	"github.com/krinnnout/reserve-get-served/api/handlers"
 	"github.com/krinnnout/reserve-get-served/api/middleware"
 	"github.com/krinnnout/reserve-get-served/db"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,7 +19,7 @@ var config = fiber.Config{
 }
 
 func main() {
-	listenAddress := flag.String("Listen Address", ":5000", "The listen address for the api")
+	listenAddress := flag.String("Listen Address", ":1337", "The listen address for the api")
 	flag.Parse()
 
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
@@ -38,11 +38,11 @@ func main() {
 			Room:    roomStore,
 			Booking: bookingStore,
 		}
-		hotelHandler   = api.NewHotelHandler(store)
-		userHandler    = api.NewUserHandler(userStore)
-		authHandler    = api.NewAuthHandler(userStore)
-		roomHandler    = api.NewRoomHandler(store)
-		bookingHandler = api.NewBookingHandler(store)
+		hotelHandler   = handlers.NewHotelHandler(store)
+		userHandler    = handlers.NewUserHandler(userStore)
+		authHandler    = handlers.NewAuthHandler(userStore)
+		roomHandler    = handlers.NewRoomHandler(store)
+		bookingHandler = handlers.NewBookingHandler(store)
 		app            = fiber.New(config)
 		apiv1          = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
 		auth           = app.Group("/api")
